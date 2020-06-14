@@ -58,7 +58,7 @@ class Optimizer:
             model += xsum(v_i_j[i][j] for j in range(len(v_i_j[i]))) == 1
 
 
-        for i in range(len(x.content)):
+        for i in range(len(trees)):
             tree   = trees[i].tree_
             leaves = atm.get_leaves(tree)
 
@@ -68,7 +68,7 @@ class Optimizer:
                 ancestors   = pi[j]
                 n_ancestors = len(ancestors) # |pi_t_k|
 
-                model += xsum(atm.predicates_mask(tree, a, partitions)[m] * v_i_j[tree.feature[a[0]]][m] \
+                model += xsum(atm.predicates_mask(tree, a, partitions, x.types)[m] * v_i_j[tree.feature[a[0]]][m] \
                               for a in ancestors for m in range(len(v_i_j[tree.feature[a[0]]])))\
                               >= (phi_t_k[i][j] * n_ancestors)
 
@@ -96,10 +96,16 @@ def cost_matrix(partitions, x, p=0):
         s = partitions[i]
         feat_cost = []
         for j in range(len(s)):
-            if (x[i] >= s[j][0]) and (x[i] < s[j][1]):
-                feat_cost.append(0)
+            if len(s[j]) > 1:
+                if (x[i] >= s[j][0]) and (x[i] < s[j][1]):
+                    feat_cost.append(0)
+                else:
+                    feat_cost.append(min((x[i] - s[j][0]) ** p, (x[i] - s[j][1]) ** p))
             else:
-                feat_cost.append(min((x[i] - s[j][0]) ** p, (x[i] - s[j][1]) ** p))
+                if x[i] == s[j][0]:
+                    feat_cost.append(0)
+                else:
+                    feat_cost.append(1)
         C_i_j.append(feat_cost)
 
     return C_i_j

@@ -2,8 +2,10 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"SEED": "02_Optimizer.ipynb",
+index = {"URLS": "00_core.ipynb",
          "get_example_dataset": "00_core.ipynb",
+         "get_external_dataset": "00_core.ipynb",
+         "SEED": "02_Optimizer.ipynb",
          "ATMSKLEARN": "01_Representation.ipynb",
          "combine": "01_Representation.ipynb",
          "Instance": "01_Representation.ipynb",

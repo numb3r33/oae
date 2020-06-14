@@ -19,8 +19,9 @@ np.random.seed(SEED)
 
 # Cell
 class ATMSKLEARN:
-    def __init__(self, trained_model):
+    def __init__(self, trained_model, X):
         self.trained_model = trained_model
+        self.X = X
 
         self.check_tree_with_no_leaves()
 
@@ -49,7 +50,7 @@ class ATMSKLEARN:
         idx = np.where(tree.feature == fidx)[0]
         return list(tree.threshold[idx]) if len(idx) > 0 else []
 
-    def make_partitions(self, splits, INF=1e8):
+    def make_partitions_num(self, splits, INF=1e8):
         splits = np.insert(splits, 0, -INF)
         splits = np.insert(splits, len(splits), INF)
 
@@ -57,6 +58,15 @@ class ATMSKLEARN:
         for i in range(len(splits) - 1):
             partitions.append([splits[i], splits[i+1]])
 
+        return partitions
+
+    def make_partitions_cat(self, splits):
+        max_val = splits[-1] + 1
+        splits  = np.insert(splits, len(splits), max_val)
+
+        partitions = []
+        for i in range(len(splits) - 1):
+            partitions.append([splits[i], splits[i+1]])
         return partitions
 
     def h_k(self, tree, combine, class_):
@@ -75,12 +85,13 @@ class ATMSKLEARN:
         return [self.phi_k(tree.tree_, x) for tree in self.get_trees()]
 
     def feature_partitions_cat(self, fidx):
-        return np.hstack(sorted([self.get_node_threshold(tree.tree_, fidx) for tree in self.get_trees()])).reshape(-1, 1)
+        splits  = np.sort(np.unique(self.X[:, fidx]))
+        return self.make_partitions_cat(splits)
 
     def feature_partitions_num(self, fidx):
         splits = np.hstack([self.get_node_threshold(tree.tree_, fidx) for tree in self.get_trees()])
-        splits = np.sort(splits)
-        return self.make_partitions(splits)
+        splits = np.sort(np.unique(splits))
+        return self.make_partitions_num(splits)
 
     def v_j(self, fidx, ftype):
         if ftype == 'categorical': return self.feature_partitions_cat(fidx)
@@ -91,11 +102,25 @@ class ATMSKLEARN:
         feat    = feature.content
         return [self.v_j(i, fdtypes[i]) for i in range(len(fdtypes))]
 
-    def v_j_mask(self, partition, fval):
-        return [1 if fval >= s[0] and fval < s[len(s) - 1] else 0 for s in partition]
+    def v_j_mask(self, partition, fval, ftype):
+        mask = []
+
+        for s in partition:
+            if ftype == 'numerical':
+                if (fval > s[0]) and (fval <= s[1]):
+                    mask.append(1)
+                else:
+                    mask.append(0)
+            else:
+                if (fval >= s[0]) and (fval < s[1]):
+                    mask.append(1)
+                else:
+                    mask.append(0)
+
+        return mask
 
     def v_i_j_mask(self, partitions, feature):
-        return [self.v_j_mask(partitions[i], feature.content[i]) for i in range(len(partitions))]
+        return [self.v_j_mask(partitions[i], feature.content[i], feature.types[i]) for i in range(len(partitions))]
 
     def mask_v_j(self, mask, partition):
         return [partition[midx] for midx, m in enumerate(mask) if m]
@@ -114,7 +139,7 @@ class ATMSKLEARN:
                 changes.append(f'no change, current value: {feature.content[i]}')
             else:
                 sol_mask_one_idx  = np.where(np.array(sol_mask[i]) == 1)[0][0]
-                changes.append(f'current value: {feature.content[i]}, proposed range: {partitions[i][sol_mask_one_idx]}')
+                changes.append(f'current value: {feature.content[i]}, proposed change: {partitions[i][sol_mask_one_idx]}')
 
         return changes
 
@@ -123,17 +148,25 @@ class ATMSKLEARN:
         orig_mask  = self.v_i_j_mask(partitions, feature)
 
         fnames = feature.fnames
+        dtypes = feature.types
 
         transformed_feature = []
+
         for i in range(len(sol_mask)):
             if sol_mask[i] == orig_mask[i]:
                 transformed_feature.append(feature.content[i])
             else:
                 sol_mask_one_idx  = np.where(np.array(sol_mask[i]) == 1)[0][0]
-                if len(partitions[i][sol_mask_one_idx]) > 1:
-                    transformed_feature.append(np.random.uniform(partitions[i][sol_mask_one_idx][0],
+                if dtypes[i] == 'numerical':
+                    if i <= len(dtypes) - 1:
+                        transformed_feature.append(partitions[i][sol_mask_one_idx][1])
+                    else:
+                        diff = partitions[i][sol_mask_one_idx][1] - partitions[i][sol_mask_one_idx][0]
+                        scaled_diff = diff * 0.1
+                        transformed_feature.append(np.random.uniform(partitions[i][sol_mask_one_idx][0] + scaled_diff,
                                                                  partitions[i][sol_mask_one_idx][1]
                                                                 ))
+
                 else:
                     transformed_feature.append(partitions[i][sol_mask_one_idx][0])
 
@@ -163,16 +196,45 @@ class ATMSKLEARN:
         trees = self.get_trees()
         return [self.pi_k(tree.tree_) for tree in trees]
 
-    def predicate_mask(self, tree, fname, fidx, branch, v_i_j):
+    def predicate_mask(self, tree, fname, fidx, branch, v_i_j, dtype):
         threshold = tree.threshold[fidx]
+        filter_predicates = []
 
-        if branch == 'left': return [1 if p[1] < threshold else 0 for p in v_i_j[fname]]
-        else: return [1 if p[0] >= threshold else 0 for p in v_i_j[fname]]
+        if branch == 'left':
+            for p in v_i_j[fname]:
+                if dtype == 'numerical':
+                    if p[len(p) - 1] <= threshold:
+                        filter_predicates.append(1)
+                    else:
+                        filter_predicates.append(0)
+                else:
+                    if p[len(p) - 1] < threshold:
+                        filter_predicates.append(1)
+                    else:
+                        if (p[0] <= threshold):
+                            filter_predicates.append(1)
+                        else:
+                            filter_predicates.append(0)
+        else:
+            for p in v_i_j[fname]:
+                if dtype == 'numerical':
+                    if p[0] >= threshold:
+                        filter_predicates.append(1)
+                    else:
+                        filter_predicates.append(0)
+                else:
+                    if p[0] > threshold:
+                        filter_predicates.append(1)
+                    else:
+                        filter_predicates.append(0)
 
-    def predicates_mask(self, tree, ancestor, v_i_j):
+        return filter_predicates
+
+    def predicates_mask(self, tree, ancestor, v_i_j, dtypes):
         p, p_branch = ancestor
         fname = tree.feature[p]
-        return self.predicate_mask(tree, fname, p, p_branch, v_i_j)
+        dtype = dtypes[fname]
+        return self.predicate_mask(tree, fname, p, p_branch, v_i_j, dtype)
 
 # Cell
 def combine(leaves_value, class_):
@@ -184,10 +246,10 @@ class Instance:
     def __init__(self, x, dtypes):
         if len(dtypes) == 0: raise ValueError('Data type list cannot be empty')
 
-        if isinstance(x, pd.Series): self.content = self.x.values
+        if isinstance(x, pd.Series): self.content = x.values
         else: self.content = np.array(x)
 
-        if isinstance(x, pd.Series): self.feat_names = x.columns.tolist()
+        if isinstance(x, pd.Series): self.feat_names = x.index.tolist()
         else: self.feat_names = [f'f_{i}' for i in range(len(x))]
 
         self.types = dtypes
