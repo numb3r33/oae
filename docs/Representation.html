@@ -5,8 +5,8 @@ title: Representation
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "How to represent a trained additive tree model?"
-description: "How to represent a trained additive tree model?"
+summary: "How to represent a trained Random Forest ( scikit-learn ) model?"
+description: "How to represent a trained Random Forest ( scikit-learn ) model?"
 ---
 <!--
 
@@ -69,7 +69,7 @@ description: "How to represent a trained additive tree model?"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span><span class="p">,</span> <span class="n">ytr</span><span class="p">,</span> <span class="n">yte</span> <span class="o">=</span> <span class="n">get_example_dataset</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span><span class="p">,</span> <span class="n">ytr</span><span class="p">,</span> <span class="n">yte</span> <span class="o">=</span> <span class="n">get_example_dataset</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -86,7 +86,7 @@ description: "How to represent a trained additive tree model?"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xtr</span><span class="p">,</span> <span class="n">ytr</span><span class="p">)</span>
 </pre></div>
 
@@ -102,7 +102,7 @@ description: "How to represent a trained additive tree model?"
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>RandomForestClassifier(max_depth=3, n_estimators=5, n_jobs=-1, random_state=41)</pre>
+<pre>RandomForestClassifier(n_estimators=5, n_jobs=-1, random_state=41)</pre>
 </div>
 
 </div>
@@ -131,7 +131,7 @@ description: "How to represent a trained additive tree model?"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ATMSKLEARN" class="doc_header"><code>class</code> <code>ATMSKLEARN</code><a href="https://github.com/numb3r33/oae/tree/master/oae/tree.py#L21" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ATMSKLEARN</code>(<strong><code>trained_model</code></strong>)</p>
+<h2 id="ATMSKLEARN" class="doc_header"><code>class</code> <code>ATMSKLEARN</code><a href="https://github.com/numb3r33/oae/tree/master/oae/tree.py#L21" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ATMSKLEARN</code>(<strong><code>trained_model</code></strong>, <strong><code>X</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -162,7 +162,7 @@ description: "How to represent a trained additive tree model?"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="combine" class="doc_header"><code>combine</code><a href="https://github.com/numb3r33/oae/tree/master/oae/tree.py#L178" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>combine</code>(<strong><code>leaves_value</code></strong>, <strong><code>class_</code></strong>)</p>
+<h4 id="combine" class="doc_header"><code>combine</code><a href="https://github.com/numb3r33/oae/tree/master/oae/tree.py#L240" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>combine</code>(<strong><code>leaves_value</code></strong>, <strong><code>class_</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -182,17 +182,14 @@ description: "How to represent a trained additive tree model?"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span><span class="p">)))</span>
 
 <span class="k">assert</span> <span class="n">atm</span><span class="o">.</span><span class="n">num_trees</span> <span class="o">==</span> <span class="mi">5</span>
 <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">atm</span><span class="o">.</span><span class="n">calculate_tree_weights</span><span class="p">()</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="o">/</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span><span class="p">))</span>
-<span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">atm</span><span class="o">.</span><span class="n">get_leaves</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tree_</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 
 <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="n">leaves_value</span><span class="p">,</span> <span class="n">class_</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">class_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">class_</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="p">[(</span><span class="n">c</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">/</span> <span class="n">c</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">())[</span><span class="n">class_</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">leaves_value</span><span class="p">]</span>
-
-<span class="k">assert</span> <span class="n">atm</span><span class="o">.</span><span class="n">h_k</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">combine</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.10526315789473684</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
 </pre></div>
 
     </div>
@@ -246,11 +243,11 @@ for tree-0 this instance would reach 0th leaf, for tree-1 this instance would al
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[[1, 0, 0, 0, 0, 0],
- [1, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 1, 0, 0],
- [0, 1, 0, 0, 0],
- [0, 1, 0, 0, 0, 0]]</pre>
+<pre>[[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+ [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+ [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+ [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+ [0, 0, 0, 1, 0, 0, 0, 0, 0]]</pre>
 </div>
 
 </div>
@@ -307,43 +304,6 @@ $f_{t}(x) = \sum_{k=1}^{m_t} h_{t,k}\phi_{t,k}$, where $h_{t_k} \in R$</p>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span><span class="o">.</span><span class="n">h_t_k</span><span class="p">(</span><span class="n">combine</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>[[1.0, 0.4, 1.0, 1.0, 0.10526315789473684, 0.5],
- [1.0, 0.0, 0.8571428571428571, 1.0, 0.07317073170731707, 1.0],
- [0.0, 1.0, 0.0, 0.75, 0.75, 1.0, 1.0, 0.16666666666666666],
- [1.0, 0.8333333333333334, 1.0, 0.13953488372093023, 0.7142857142857143],
- [0.0, 0.9375, 1.0, 0.0, 0.16, 1.0]]</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">h_t_k</span>   <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">h_t_k</span><span class="p">(</span><span class="n">combine</span><span class="p">)</span>
 <span class="n">phi_t_k</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">phi_t_k</span><span class="p">(</span><span class="n">Xte</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span> 
 <span class="n">w_t</span>     <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">calculate_tree_weights</span><span class="p">()</span>
@@ -378,7 +338,7 @@ $f_{t}(x) = \sum_{k=1}^{m_t} h_{t,k}\phi_{t,k}$, where $h_{t_k} \in R$</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([[0.04583333, 0.95416667]])</pre>
+<pre>array([[0.2, 0.8]])</pre>
 </div>
 
 </div>
@@ -405,7 +365,7 @@ $f_{t}(x) = \sum_{k=1}^{m_t} h_{t,k}\phi_{t,k}$, where $h_{t_k} \in R$</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">tolerance</span> <span class="o">=</span> <span class="mf">1e-6</span>
 <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">h_t_k</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">phi_t_k</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">w_t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_t_k</span><span class="p">))</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">h_t_k</span><span class="p">[</span><span class="n">i</span><span class="p">]))])</span>\
-              <span class="o">-</span> <span class="mf">0.9541667</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
+              <span class="o">-</span> <span class="mf">0.8</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
 </pre></div>
 
     </div>
@@ -433,7 +393,7 @@ $f_{t}(x) = \sum_{k=1}^{m_t} h_{t,k}\phi_{t,k}$, where $h_{t_k} \in R$</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Instance" class="doc_header"><code>class</code> <code>Instance</code><a href="https://github.com/numb3r33/oae/tree/master/oae/tree.py#L183" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Instance</code>(<strong><code>x</code></strong>, <strong><code>dtypes</code></strong>)</p>
+<h2 id="Instance" class="doc_header"><code>class</code> <code>Instance</code><a href="https://github.com/numb3r33/oae/tree/master/oae/tree.py#L245" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Instance</code>(<strong><code>x</code></strong>, <strong><code>dtypes</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -483,17 +443,7 @@ $$\sum_{j=1}^{n_i} v_{i,j} = 1$$
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span>
-
-<span class="n">partitions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1e8</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.7815466523170471</span><span class="p">],</span>
-             <span class="p">[</span><span class="o">-</span><span class="mf">1.7815466523170471</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.470717191696167</span><span class="p">],</span>
-             <span class="p">[</span><span class="o">-</span><span class="mf">1.470717191696167</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0116309821605682</span><span class="p">],</span>
-             <span class="p">[</span><span class="o">-</span><span class="mf">1.0116309821605682</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5423658043146133</span><span class="p">],</span>
-             <span class="p">[</span><span class="o">-</span><span class="mf">0.5423658043146133</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.531291589140892</span><span class="p">],</span>
-             <span class="p">[</span><span class="o">-</span><span class="mf">0.531291589140892</span><span class="p">,</span> <span class="mf">2.3792918920516968</span><span class="p">],</span>
-             <span class="p">[</span><span class="mf">2.3792918920516968</span><span class="p">,</span> <span class="mf">1e8</span><span class="p">]])</span>
-
-<span class="k">assert</span> <span class="nb">all</span><span class="p">((</span><span class="n">atm</span><span class="o">.</span><span class="n">v_j</span><span class="p">(</span><span class="n">fidx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="s1">&#39;numerical&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">partitions</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span><span class="p">)))</span>
 </pre></div>
 
     </div>
@@ -600,36 +550,70 @@ $$\sum_{j=1}^{n_i} v_{i,j} = 1$$
 
 <div class="output_text output_subarea output_execute_result">
 <pre>[[[-100000000.0, -2.0248294472694397],
-  [-2.0248294472694397, 0.6338021159172058],
-  [0.6338021159172058, 0.6439935863018036],
+  [-2.0248294472694397, -1.2423902750015259],
+  [-1.2423902750015259, -1.0648272037506104],
+  [-1.0648272037506104, -0.42396698892116547],
+  [-0.42396698892116547, -0.10306572914123535],
+  [-0.10306572914123535, 0.6439935863018036],
   [0.6439935863018036, 0.6447310447692871],
   [0.6447310447692871, 0.836201936006546],
   [0.836201936006546, 0.8496142029762268],
-  [0.8496142029762268, 100000000.0]],
- [[-100000000.0, -1.7815466523170471],
-  [-1.7815466523170471, -1.470717191696167],
-  [-1.470717191696167, -1.0116309821605682],
-  [-1.0116309821605682, -0.5423658043146133],
+  [0.8496142029762268, 0.914455235004425],
+  [0.914455235004425, 1.096608817577362],
+  [1.096608817577362, 1.1486619710922241],
+  [1.1486619710922241, 1.5790348649024963],
+  [1.5790348649024963, 100000000.0]],
+ [[-100000000.0, -1.470717191696167],
+  [-1.470717191696167, -1.1500263214111328],
+  [-1.1500263214111328, -0.5423658043146133],
   [-0.5423658043146133, -0.531291589140892],
-  [-0.531291589140892, 2.3792918920516968],
+  [-0.531291589140892, -0.12118824571371078],
+  [-0.12118824571371078, 0.1686990186572075],
+  [0.1686990186572075, 0.35822106897830963],
+  [0.35822106897830963, 0.41557787358760834],
+  [0.41557787358760834, 2.3792918920516968],
   [2.3792918920516968, 100000000.0]],
- [[-100000000.0, -0.5003760457038879],
-  [-0.5003760457038879, 0.10728693753480911],
-  [0.10728693753480911, 0.2221900150179863],
-  [0.2221900150179863, 0.2427385449409485],
-  [0.2427385449409485, 0.3585205078125],
-  [0.3585205078125, 0.6139787286520004],
-  [0.6139787286520004, 0.6645539551973343],
-  [0.6645539551973343, 100000000.0]],
- [[-100000000.0, -0.16905810683965683],
+ [[-100000000.0, -1.4785081148147583],
+  [-1.4785081148147583, -0.8463370203971863],
+  [-0.8463370203971863, -0.7427763640880585],
+  [-0.7427763640880585, -0.6585032045841217],
+  [-0.6585032045841217, -0.1557881347835064],
+  [-0.1557881347835064, -0.14745968580245972],
+  [-0.14745968580245972, 0.10728693753480911],
+  [0.10728693753480911, 0.2427385449409485],
+  [0.2427385449409485, 0.30658136308193207],
+  [0.30658136308193207, 0.3585205078125],
+  [0.3585205078125, 0.38348717987537384],
+  [0.38348717987537384, 0.4289112240076065],
+  [0.4289112240076065, 0.4685207009315491],
+  [0.4685207009315491, 100000000.0]],
+ [[-100000000.0, -0.24541949480772018],
+  [-0.24541949480772018, -0.16905810683965683],
   [-0.16905810683965683, -0.1664411947131157],
   [-0.1664411947131157, -0.14978579431772232],
   [-0.14978579431772232, -0.14464405924081802],
-  [-0.14464405924081802, 100000000.0]],
- [[-100000000.0, -1.0038151741027832],
+  [-0.14464405924081802, -0.033745707711204886],
+  [-0.033745707711204886, -0.002453504828736186],
+  [-0.002453504828736186, 0.11794959381222725],
+  [0.11794959381222725, 0.2094322368502617],
+  [0.2094322368502617, 0.25495275668799877],
+  [0.25495275668799877, 100000000.0]],
+ [[-100000000.0, -1.136821210384369],
+  [-1.136821210384369, -1.0038151741027832],
   [-1.0038151741027832, -0.8827621340751648],
-  [-0.8827621340751648, 0.6848085820674896],
-  [0.6848085820674896, 100000000.0]]]</pre>
+  [-0.8827621340751648, -0.38978028297424316],
+  [-0.38978028297424316, -0.31629133224487305],
+  [-0.31629133224487305, 0.07762494683265686],
+  [0.07762494683265686, 0.2304462417960167],
+  [0.2304462417960167, 0.3767264783382416],
+  [0.3767264783382416, 0.4243736043572426],
+  [0.4243736043572426, 0.4500375986099243],
+  [0.4500375986099243, 0.5001247227191925],
+  [0.5001247227191925, 0.6438964009284973],
+  [0.6438964009284973, 0.6848085820674896],
+  [0.6848085820674896, 0.836023598909378],
+  [0.836023598909378, 0.9093806743621826],
+  [0.9093806743621826, 100000000.0]]]</pre>
 </div>
 
 </div>
@@ -647,7 +631,7 @@ $$\sum_{j=1}^{n_i} v_{i,j} = 1$$
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span><span class="p">)))</span>
 
 <span class="n">partitions</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">v_i_j</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
 <span class="n">v_i_j_mask</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">v_i_j_mask</span><span class="p">(</span><span class="n">partitions</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
@@ -676,12 +660,9 @@ $$\sum_{j=1}^{n_i} v_{i,j} = 1$$
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span><span class="p">)))</span>
 
 <span class="n">pi_t_k</span>  <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">pi_t_k</span><span class="p">()</span>
-
-<span class="k">assert</span> <span class="n">pi_t_k</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">)]</span>
-<span class="k">assert</span> <span class="n">pi_t_k</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">),</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">)]</span>
 </pre></div>
 
     </div>
@@ -706,7 +687,7 @@ $$\sum_{j=1}^{n_i} v_{i,j} = 1$$
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">atm</span> <span class="o">=</span> <span class="n">ATMSKLEARN</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span><span class="p">)))</span>
 
 <span class="n">h_t_k</span>   <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">h_t_k</span><span class="p">(</span><span class="n">combine</span><span class="p">)</span>
 <span class="n">phi_t_k</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">phi_t_k</span><span class="p">(</span><span class="n">Xte</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span> 
@@ -719,7 +700,7 @@ $$\sum_{j=1}^{n_i} v_{i,j} = 1$$
 
 <span class="n">pi_t_k</span>  <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">pi_t_k</span><span class="p">()</span>
 
-<span class="n">atm</span><span class="o">.</span><span class="n">predicates_mask</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">pi_t_k</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">partitions</span><span class="p">)</span>
+<span class="n">atm</span><span class="o">.</span><span class="n">predicates_mask</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">pi_t_k</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">partitions</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">types</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -734,7 +715,7 @@ $$\sum_{j=1}^{n_i} v_{i,j} = 1$$
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[1, 1, 0, 0, 0, 0, 0]</pre>
+<pre>[1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]</pre>
 </div>
 
 </div>
@@ -752,7 +733,7 @@ $$\sum_{j=1}^{n_i} v_{i,j} = 1$$
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s_t_k_p</span> <span class="o">=</span> <span class="p">[[[</span><span class="n">atm</span><span class="o">.</span><span class="n">predicates_mask</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">partitions</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">pi_t_k</span><span class="p">[</span><span class="n">tidx</span><span class="p">][</span><span class="n">kidx</span><span class="p">]]</span>\
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">s_t_k_p</span> <span class="o">=</span> <span class="p">[[{</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">atm</span><span class="o">.</span><span class="n">predicates_mask</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">tree_</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">partitions</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">types</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">pi_t_k</span><span class="p">[</span><span class="n">tidx</span><span class="p">][</span><span class="n">kidx</span><span class="p">]}</span>\
            <span class="k">for</span> <span class="n">kidx</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">atm</span><span class="o">.</span><span class="n">get_leaves</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">tree_</span><span class="p">))]</span> \
            <span class="k">for</span> <span class="n">tidx</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">estimators_</span><span class="p">)]</span>
 </pre></div>
@@ -792,8 +773,8 @@ $$\phi_{t, k} \leq \frac {1}{\mid {\pi_{t,k}}\mid} \sum_{p \in \pi_{t,k}}\sum_{v
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atm</span><span class="o">.</span><span class="n">get_leaves</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tree_</span><span class="p">))):</span>
         <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">nancestors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pi_t_k</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">predicate</span> <span class="ow">in</span> <span class="n">s_t_k_p</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]:</span>
-            <span class="n">res</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">predicate</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">predicate</span> <span class="ow">in</span> <span class="n">s_t_k_p</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">res</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">predicate</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v_i_j_mask</span><span class="p">[</span><span class="n">trees</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="n">k</span><span class="p">]]))</span>
         
         <span class="k">if</span> <span class="n">phi_t_k</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">res</span> <span class="o">/</span> <span class="n">nancestors</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s1">&#39;Decision Logic constraint violated&#39;</span><span class="p">)</span>

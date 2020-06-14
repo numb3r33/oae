@@ -3,6 +3,7 @@
     "Overview": "/",
     "Core": "/core",
     "Representation": "/Representation",
-    "Optimizer": "/Optimizer"
+    "Optimizer": "/Optimizer",
+    "Tutorial": "/tutorial_breast_cancer"
   }
 }

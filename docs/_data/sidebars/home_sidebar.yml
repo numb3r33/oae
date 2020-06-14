@@ -18,6 +18,9 @@ entries:
     - output: web,pdf
       title: Optimizer
       url: /Optimizer
+    - output: web,pdf
+      title: Tutorial
+      url: /tutorial_breast_cancer
     output: web
     title: oae
   output: web
