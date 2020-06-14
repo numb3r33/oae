@@ -372,4 +372,4 @@ Indeed we can see that classifier will label it as `0` and probability is also g
 
 ## Applications
 
-- In targeted marketing, we can use the action plan generated per customer to better understand which all levers can we pull to understand desired results.
+- One example coult be in targeted marketing, we can use the action plan generated per customer to better understand which all levers can we pull to get desired results.
